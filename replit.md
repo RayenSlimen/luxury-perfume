@@ -6,17 +6,28 @@ pnpm workspace monorepo using TypeScript. Full-stack luxury perfume e-commerce w
 
 ## Project: Velmora — Parfumerie de Luxe
 
-A full-stack luxury perfume e-commerce website in French with a dark, gold-accented premium aesthetic inspired by Dior, Chanel, and Tom Ford.
+A full-stack luxury perfume e-commerce website in French with a dark, silver-accented premium aesthetic inspired by Dior, Chanel, and Tom Ford.
 
 ### Features
 - Complete French UI ("Ressentez la puissance de l'élégance")
 - JWT authentication (login/register)
-- Product catalogue with filters (category: homme/femme/unisexe, price, search)
-- Product detail pages with similar products
+- Product catalogue with 9 category filters (homme, femme, unisexe, oriental, floral, boisé, aquatique, gourmand, citrus)
+- Product detail pages with volume selector (50ml/100ml), price adjustment, livraison gratuite badge
 - Dynamic shopping cart (guest localStorage + authenticated API sync)
 - Order placement and order history
-- Admin dashboard (stats, product CRUD, order status management)
-- Dark luxury theme: deep black backgrounds, gold accents, serif editorial typography
+- **Comprehensive admin dashboard** — full sidebar layout (no Navbar/Footer), 15 sections:
+  - Tableau de bord: stats cards + line chart + pie chart + recent orders
+  - Commandes: full table with status select, tabs, search/filter
+  - Produits: CRUD (add/edit/delete) + image preview + category filter
+  - Catégories: derived from products, manage visibility
+  - Up/Cross Sells: upsell management panel
+  - Statistiques: Livraison, Équipe, Produits, Marketing — charts + stat cards
+  - Calculateur: fully functional profit calculator (9 inputs → 6 result cards)
+  - Budget: balance overview + revenue/expense tracking
+  - Équipe: team member table
+  - Boutique: Thème (5 themes + banners), Paramètres (store details + social), Facturation (billing + transactions)
+- Silver theme: `--primary: 0 0% 72%` across all CSS variables
+- 13 perfumes across 6 categories seeded in DB
 
 ### Seed credentials
 - Admin: `admin@velmora.fr` / `admin123`
@@ -28,7 +39,7 @@ A full-stack luxury perfume e-commerce website in French with a dark, gold-accen
 - **Node.js version**: 24
 - **Package manager**: pnpm
 - **TypeScript version**: 5.9
-- **Frontend**: React + Vite + Tailwind CSS + Framer Motion + Wouter
+- **Frontend**: React + Vite + Tailwind CSS + Framer Motion + Wouter + Recharts
 - **API framework**: Express 5
 - **Database**: PostgreSQL + Drizzle ORM
 - **Auth**: JWT (jsonwebtoken) + bcryptjs
@@ -50,10 +61,14 @@ A full-stack luxury perfume e-commerce website in French with a dark, gold-accen
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 
+## Admin Routing
+
+The `/admin` route is handled as a special case in `App.tsx` — it renders the `Admin` component directly without Navbar/Footer. The Admin component uses a `flex h-screen` full-screen sidebar layout. Unauthenticated users are redirected to `/`.
+
 ## Database Schema
 
 - `utilisateurs` — users (id, nom, email, mot_de_passe, role: client|admin)
-- `produits` — perfumes (id, nom, description, prix, image_url, categorie, en_vedette, nombre_ventes)
+- `produits` — perfumes (id, nom, description, prix, image_url, categorie: text, en_vedette, nombre_ventes)
 - `panier_items` — cart items (id, user_id, produit_id, quantite)
 - `commandes` — orders (id, user_id, total, statut: en_attente|confirmee|expediee|livree|annulee)
 - `commande_items` — order line items (id, commande_id, produit_id, quantite, prix_unitaire)

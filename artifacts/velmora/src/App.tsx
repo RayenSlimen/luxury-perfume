@@ -8,7 +8,6 @@ import { CartProvider } from "@/lib/cart";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 
-// Pages
 import Home from "@/pages/Home";
 import Catalogue from "@/pages/Catalogue";
 import ProduitDetail from "@/pages/ProduitDetail";
@@ -19,31 +18,38 @@ import Commandes from "@/pages/Commandes";
 import Admin from "@/pages/Admin";
 
 const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-    },
-  },
+  defaultOptions: { queries: { retry: false } },
 });
 
 function Router() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
-      <Navbar />
-      <main className="flex-grow pt-[88px] selection:bg-primary/30 selection:text-white">
-        <Switch>
-          <Route path="/" component={Home} />
-          <Route path="/produits" component={Catalogue} />
-          <Route path="/produits/:id" component={ProduitDetail} />
-          <Route path="/panier" component={Panier} />
-          <Route path="/connexion" component={Connexion} />
-          <Route path="/inscription" component={Inscription} />
-          <Route path="/commandes" component={Commandes} />
-          <Route path="/admin" component={Admin} />
-          <Route component={NotFound} />
-        </Switch>
-      </main>
-      <Footer />
+      <Switch>
+        {/* Admin gets its own full-screen layout — no Navbar/Footer */}
+        <Route path="/admin" component={Admin} />
+
+        {/* All other pages use the standard layout */}
+        <Route>
+          {() => (
+            <>
+              <Navbar />
+              <main className="flex-grow pt-[88px] selection:bg-primary/30 selection:text-white">
+                <Switch>
+                  <Route path="/" component={Home} />
+                  <Route path="/produits" component={Catalogue} />
+                  <Route path="/produits/:id" component={ProduitDetail} />
+                  <Route path="/panier" component={Panier} />
+                  <Route path="/connexion" component={Connexion} />
+                  <Route path="/inscription" component={Inscription} />
+                  <Route path="/commandes" component={Commandes} />
+                  <Route component={NotFound} />
+                </Switch>
+              </main>
+              <Footer />
+            </>
+          )}
+        </Route>
+      </Switch>
     </div>
   );
 }
