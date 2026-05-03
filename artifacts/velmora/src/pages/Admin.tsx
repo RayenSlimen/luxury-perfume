@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 import { useLocation, Link } from "wouter";
 import {
@@ -148,8 +148,13 @@ export default function Admin() {
     });
   };
 
+  useEffect(() => {
+    if (!authLoading && (!user || !isAdmin)) {
+      setLocation("/");
+    }
+  }, [authLoading, user, isAdmin]);
+
   if (!authLoading && (!user || !isAdmin)) {
-    setLocation("/");
     return null;
   }
 
