@@ -59,7 +59,7 @@ export default function Home() {
       <div className="bg-primary/10 border-y border-primary/20 py-4">
         <div className="container mx-auto px-6 text-center">
           <p className="text-primary tracking-widest uppercase text-xs font-medium">
-            ✨ Échantillon offert avec chaque commande ✨
+            Un échantillon offert avec chaque parfum | 🚚 Livraison gratuite 🎁
           </p>
         </div>
       </div>
