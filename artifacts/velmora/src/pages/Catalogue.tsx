@@ -31,10 +31,16 @@ export default function Catalogue() {
   });
 
   const categories = [
-    { id: undefined, label: "Toutes les collections" },
+    { id: undefined, label: "Tous" },
     { id: "femme" as GetProduitsCategorie, label: "Pour Elle" },
     { id: "homme" as GetProduitsCategorie, label: "Pour Lui" },
-    { id: "unisexe" as GetProduitsCategorie, label: "Unisexe" }
+    { id: "unisexe" as GetProduitsCategorie, label: "Unisexe" },
+    { id: "oriental" as GetProduitsCategorie, label: "Oriental" },
+    { id: "floral" as GetProduitsCategorie, label: "Floral" },
+    { id: "boise" as GetProduitsCategorie, label: "Boisé" },
+    { id: "aquatique" as GetProduitsCategorie, label: "Aquatique" },
+    { id: "gourmand" as GetProduitsCategorie, label: "Gourmand" },
+    { id: "citrus" as GetProduitsCategorie, label: "Citrus" },
   ];
 
   return (

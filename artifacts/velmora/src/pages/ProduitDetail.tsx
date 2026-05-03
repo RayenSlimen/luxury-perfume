@@ -105,7 +105,17 @@ export default function ProduitDetail() {
           {/* Details */}
           <div className="flex flex-col justify-center">
             <p className="text-primary tracking-widest uppercase text-sm mb-4">
-              {produit.categorie === 'homme' ? 'Pour Lui' : produit.categorie === 'femme' ? 'Pour Elle' : 'Unisexe'}
+              {{
+                homme: 'Pour Lui',
+                femme: 'Pour Elle',
+                unisexe: 'Unisexe',
+                oriental: 'Oriental',
+                floral: 'Floral',
+                boise: 'Boisé',
+                aquatique: 'Aquatique',
+                gourmand: 'Gourmand',
+                citrus: 'Citrus',
+              }[produit.categorie] ?? produit.categorie}
             </p>
             <h1 className="font-serif text-4xl md:text-6xl text-foreground mb-6 leading-tight">
               {produit.nom}

@@ -13,7 +13,7 @@ router.get("/produits", async (req, res): Promise<void> => {
   if (recherche) {
     conditions.push(ilike(produitsTable.nom, `%${recherche}%`));
   }
-  if (categorie && ["homme", "femme", "unisexe"].includes(categorie)) {
+  if (categorie) {
     conditions.push(eq(produitsTable.categorie, categorie));
   }
   if (prixMin) {
