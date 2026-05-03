@@ -1,0 +1,26 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "jTN66yt-5ujQLr2JnrWxC"
+uri = "file://artifacts/velmora/public/images/perfume-1.png"
+type = "image"
+title = "Luxury perfume bottle gold dark"
+
+[[generated]]
+id = "UlV1v-S_eVZ8rtQEE9LAp"
+uri = "file://artifacts/velmora/public/images/perfume-2.png"
+type = "image"
+title = "Elegant feminine perfume dark"
+
+[[generated]]
+id = "n2vMlLHyW2nLJYEInfOkv"
+uri = "file://artifacts/velmora/public/images/perfume-3.png"
+type = "image"
+title = "Masculine luxury cologne dark"
+
+[[generated]]
+id = "EdiZ7TlwY9X3nQk3aeAcf"
+uri = "file://artifacts/velmora/public/images/hero.png"
+type = "image"
+title = "Luxury perfume hero banner"

@@ -3,20 +3,32 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Velmora Luxury Perfume E-Commerce API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: produits
+    description: Product operations
+  - name: auth
+    description: Authentication
+  - name: panier
+    description: Cart operations
+  - name: commandes
+    description: Order operations
+  - name: admin
+    description: Admin operations
+  - name: catalogue
+    description: Catalogue aggregates and discovery
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +36,779 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ─── AUTH ───────────────────────────────────────────────────────────────────
+
+  /auth/inscription:
+    post:
+      operationId: inscription
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InscriptionBody"
+      responses:
+        "201":
+          description: User registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/connexion:
+    post:
+      operationId: connexion
+      tags: [auth]
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConnexionBody"
+      responses:
+        "200":
+          description: Login success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/moi:
+    get:
+      operationId: getMoi
+      tags: [auth]
+      summary: Get current authenticated user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Utilisateur"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ─── PRODUITS ────────────────────────────────────────────────────────────────
+
+  /produits:
+    get:
+      operationId: getProduits
+      tags: [produits]
+      summary: List all perfumes with optional filters
+      parameters:
+        - name: recherche
+          in: query
+          schema:
+            type: string
+        - name: categorie
+          in: query
+          schema:
+            type: string
+            enum: [homme, femme, unisexe]
+        - name: prixMin
+          in: query
+          schema:
+            type: number
+        - name: prixMax
+          in: query
+          schema:
+            type: number
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limite
+          in: query
+          schema:
+            type: integer
+            default: 12
+      responses:
+        "200":
+          description: List of products
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProduitsPage"
+
+    post:
+      operationId: createProduit
+      tags: [admin]
+      summary: Create a new product (admin only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProduitBody"
+      responses:
+        "201":
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Produit"
+
+  /produits/{id}:
+    get:
+      operationId: getProduit
+      tags: [produits]
+      summary: Get a single product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Product details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Produit"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    put:
+      operationId: updateProduit
+      tags: [admin]
+      summary: Update a product (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProduitBody"
+      responses:
+        "200":
+          description: Updated product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Produit"
+
+    delete:
+      operationId: deleteProduit
+      tags: [admin]
+      summary: Delete a product (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /produits/{id}/similaires:
+    get:
+      operationId: getProduitsSimilaires
+      tags: [produits]
+      summary: Get similar products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Similar products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Produit"
+
+  # ─── CATALOGUE (WOW endpoints) ───────────────────────────────────────────────
+
+  /catalogue/vedettes:
+    get:
+      operationId: getVedettes
+      tags: [catalogue]
+      summary: Get featured / popular products for the home page
+      responses:
+        "200":
+          description: Featured products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Produit"
+
+  /catalogue/meilleures-ventes:
+    get:
+      operationId: getMeilleuresVentes
+      tags: [catalogue]
+      summary: Get best selling products
+      responses:
+        "200":
+          description: Best sellers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Produit"
+
+  /catalogue/stats:
+    get:
+      operationId: getCatalogueStats
+      tags: [catalogue]
+      summary: Get catalogue statistics (total products, categories breakdown)
+      responses:
+        "200":
+          description: Catalogue stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CatalogueStats"
+
+  # ─── PANIER ──────────────────────────────────────────────────────────────────
+
+  /panier:
+    get:
+      operationId: getPanier
+      tags: [panier]
+      summary: Get current user's cart
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Panier"
+
+    post:
+      operationId: ajouterAuPanier
+      tags: [panier]
+      summary: Add item to cart
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PanierItemBody"
+      responses:
+        "200":
+          description: Updated cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Panier"
+
+    delete:
+      operationId: viderPanier
+      tags: [panier]
+      summary: Clear cart
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Cart cleared
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /panier/{produitId}:
+    put:
+      operationId: modifierQuantite
+      tags: [panier]
+      summary: Update item quantity in cart
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: produitId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ModifierQuantiteBody"
+      responses:
+        "200":
+          description: Updated cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Panier"
+
+    delete:
+      operationId: supprimerDuPanier
+      tags: [panier]
+      summary: Remove item from cart
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: produitId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Updated cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Panier"
+
+  # ─── COMMANDES ───────────────────────────────────────────────────────────────
+
+  /commandes:
+    get:
+      operationId: getCommandes
+      tags: [commandes]
+      summary: Get current user's orders
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Commande"
+
+    post:
+      operationId: passerCommande
+      tags: [commandes]
+      summary: Place an order from current cart
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Commande"
+
+  /commandes/{id}:
+    get:
+      operationId: getCommande
+      tags: [commandes]
+      summary: Get a single order by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Commande"
+
+  # ─── ADMIN ───────────────────────────────────────────────────────────────────
+
+  /admin/commandes:
+    get:
+      operationId: getAdminCommandes
+      tags: [admin]
+      summary: Get all orders (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: All orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Commande"
+
+  /admin/commandes/{id}/statut:
+    put:
+      operationId: updateStatutCommande
+      tags: [admin]
+      summary: Update order status (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateStatutBody"
+      responses:
+        "200":
+          description: Updated order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Commande"
+
+  /admin/stats:
+    get:
+      operationId: getAdminStats
+      tags: [admin]
+      summary: Get admin dashboard statistics
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Admin statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStats"
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     HealthStatus:
       type: object
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required: [message]
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required: [success, message]
+
+    # ── Auth ──────────────────────────────────────────────────────────────────
+
+    InscriptionBody:
+      type: object
+      properties:
+        nom:
+          type: string
+        email:
+          type: string
+          format: email
+        motDePasse:
+          type: string
+          minLength: 6
+      required: [nom, email, motDePasse]
+
+    ConnexionBody:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        motDePasse:
+          type: string
+      required: [email, motDePasse]
+
+    Utilisateur:
+      type: object
+      properties:
+        id:
+          type: integer
+        nom:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [client, admin]
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, nom, email, role, createdAt]
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        utilisateur:
+          $ref: "#/components/schemas/Utilisateur"
+      required: [token, utilisateur]
+
+    # ── Produits ─────────────────────────────────────────────────────────────
+
+    Produit:
+      type: object
+      properties:
+        id:
+          type: integer
+        nom:
+          type: string
+        description:
+          type: string
+        prix:
+          type: number
+        imageUrl:
+          type: string
+        categorie:
+          type: string
+          enum: [homme, femme, unisexe]
+        enVedette:
+          type: boolean
+        nombreVentes:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, nom, description, prix, imageUrl, categorie, enVedette, nombreVentes, createdAt]
+
+    ProduitBody:
+      type: object
+      properties:
+        nom:
+          type: string
+        description:
+          type: string
+        prix:
+          type: number
+        imageUrl:
+          type: string
+        categorie:
+          type: string
+          enum: [homme, femme, unisexe]
+        enVedette:
+          type: boolean
+      required: [nom, description, prix, imageUrl, categorie]
+
+    ProduitsPage:
+      type: object
+      properties:
+        produits:
+          type: array
+          items:
+            $ref: "#/components/schemas/Produit"
+        total:
+          type: integer
+        page:
+          type: integer
+        totalPages:
+          type: integer
+      required: [produits, total, page, totalPages]
+
+    CatalogueStats:
+      type: object
+      properties:
+        total:
+          type: integer
+        parCategorie:
+          type: object
+          properties:
+            homme:
+              type: integer
+            femme:
+              type: integer
+            unisexe:
+              type: integer
+          required: [homme, femme, unisexe]
+      required: [total, parCategorie]
+
+    # ── Panier ────────────────────────────────────────────────────────────────
+
+    PanierItem:
+      type: object
+      properties:
+        produitId:
+          type: integer
+        quantite:
+          type: integer
+        produit:
+          $ref: "#/components/schemas/Produit"
+      required: [produitId, quantite, produit]
+
+    Panier:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/PanierItem"
+        total:
+          type: number
+        nombreArticles:
+          type: integer
+      required: [items, total, nombreArticles]
+
+    PanierItemBody:
+      type: object
+      properties:
+        produitId:
+          type: integer
+        quantite:
+          type: integer
+          default: 1
+      required: [produitId]
+
+    ModifierQuantiteBody:
+      type: object
+      properties:
+        quantite:
+          type: integer
+          minimum: 0
+      required: [quantite]
+
+    # ── Commandes ─────────────────────────────────────────────────────────────
+
+    CommandeItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        produitId:
+          type: integer
+        quantite:
+          type: integer
+        prixUnitaire:
+          type: number
+        produit:
+          $ref: "#/components/schemas/Produit"
+      required: [id, produitId, quantite, prixUnitaire, produit]
+
+    Commande:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        total:
+          type: number
+        statut:
+          type: string
+          enum: [en_attente, confirmee, expediee, livree, annulee]
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CommandeItem"
+        utilisateur:
+          $ref: "#/components/schemas/Utilisateur"
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, userId, total, statut, items, createdAt]
+
+    UpdateStatutBody:
+      type: object
+      properties:
+        statut:
+          type: string
+          enum: [en_attente, confirmee, expediee, livree, annulee]
+      required: [statut]
+
+    # ── Admin ─────────────────────────────────────────────────────────────────
+
+    AdminStats:
+      type: object
+      properties:
+        totalCommandes:
+          type: integer
+        chiffreAffaires:
+          type: number
+        totalClients:
+          type: integer
+        totalProduits:
+          type: integer
+        commandesParStatut:
+          type: object
+          properties:
+            en_attente:
+              type: integer
+            confirmee:
+              type: integer
+            expediee:
+              type: integer
+            livree:
+              type: integer
+            annulee:
+              type: integer
+          required: [en_attente, confirmee, expediee, livree, annulee]
+        commandesRecentes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Commande"
+      required: [totalCommandes, chiffreAffaires, totalClients, totalProduits, commandesParStatut, commandesRecentes]

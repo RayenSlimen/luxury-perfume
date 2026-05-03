@@ -1,0 +1,92 @@
+Create a full-stack luxury perfume e-commerce website named "Velmora".
+
+Tech stack:
+- Frontend: React.js (functional components + hooks)
+- Styling: Tailwind CSS (luxury black, gold, white theme)
+- Backend: Node.js with Express
+- Database: PostgreSQL
+
+Language:
+- The entire user interface must be in French (buttons, labels, messages, pages)
+- Use professional and elegant French wording
+
+Brand identity:
+- Velmora represents luxury, elegance, mystery
+- Slogan: "Ressentez la puissance de l’élégance"
+
+Design requirements:
+- Ultra premium UI inspired by luxury brands (Dior, Chanel, Tom Ford)
+- Dark mode (black background)
+- Gold accents and smooth gradients
+- Minimalist and clean layout
+- Smooth animations and hover effects
+- High-end typography
+
+Pages to generate:
+
+1. Accueil:
+- Hero section avec image parfum luxe + slogan
+- Produits populaires
+- Meilleures ventes
+- Section promotion ("Échantillon offert avec chaque parfum")
+- Footer élégant
+
+2. Produits:
+- Grille moderne des parfums
+- Barre de recherche (Rechercher un parfum...)
+- Filtres: prix, catégorie, homme/femme/unisexe
+
+3. Détails produit:
+- Grande image produit
+- Nom, description, prix
+- Bouton "Ajouter au panier"
+- Produits similaires
+
+4. Panier:
+- Liste des produits
+- Modifier quantité
+- Total
+- Bouton "Commander"
+
+5. Authentification:
+- Page Connexion
+- Page Inscription
+- JWT authentication
+
+6. Dashboard Admin:
+- Ajouter / modifier / supprimer produits
+- Gérer commandes
+
+Backend requirements:
+- REST API avec Express
+- CRUD produits
+- Authentification sécurisée (JWT + bcrypt)
+- Gestion commandes
+
+Database schema (PostgreSQL):
+- users (id, nom, email, mot_de_passe)
+- produits (id, nom, prix, description, image_url, categorie)
+- commandes (id, user_id, total, date)
+- commande_items (id, commande_id, produit_id, quantite)
+
+Frontend features:
+- Axios for API calls
+- React Router for navigation
+- Responsive design (mobile + desktop)
+- Loading spinners & error handling
+
+Extra features:
+- Panier dynamique
+- Design responsive
+- Code propre et bien structuré
+- Animations modernes
+
+Generate:
+- Full project structure
+- Frontend React code
+- Backend Node.js code
+- PostgreSQL schema (SQL)
+- Sample data
+- Instructions to run the project
+
+Make the design extremely modern, elegant and premium.
