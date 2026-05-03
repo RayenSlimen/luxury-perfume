@@ -138,6 +138,13 @@ export interface CommandeItem {
   produit: Produit;
 }
 
+export interface PasserCommandeBody {
+  nomLivraison: string;
+  telephone: string;
+  adresse: string;
+  wilaya: string;
+}
+
 export type CommandeStatut =
   (typeof CommandeStatut)[keyof typeof CommandeStatut];
 
@@ -154,6 +161,10 @@ export interface Commande {
   userId: number;
   total: number;
   statut: CommandeStatut;
+  nomLivraison?: string;
+  telephone?: string;
+  adresse?: string;
+  wilaya?: string;
   items: CommandeItem[];
   utilisateur?: Utilisateur;
   createdAt: string;

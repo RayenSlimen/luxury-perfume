@@ -371,6 +371,10 @@ export const GetCommandesResponseItem = zod.object({
     "livree",
     "annulee",
   ]),
+  nomLivraison: zod.string().optional(),
+  telephone: zod.string().optional(),
+  adresse: zod.string().optional(),
+  wilaya: zod.string().optional(),
   items: zod.array(
     zod.object({
       id: zod.number(),
@@ -404,6 +408,16 @@ export const GetCommandesResponseItem = zod.object({
 export const GetCommandesResponse = zod.array(GetCommandesResponseItem);
 
 /**
+ * @summary Place an order from current cart
+ */
+export const PasserCommandeBody = zod.object({
+  nomLivraison: zod.string(),
+  telephone: zod.string(),
+  adresse: zod.string(),
+  wilaya: zod.string(),
+});
+
+/**
  * @summary Get a single order by ID
  */
 export const GetCommandeParams = zod.object({
@@ -421,6 +435,10 @@ export const GetCommandeResponse = zod.object({
     "livree",
     "annulee",
   ]),
+  nomLivraison: zod.string().optional(),
+  telephone: zod.string().optional(),
+  adresse: zod.string().optional(),
+  wilaya: zod.string().optional(),
   items: zod.array(
     zod.object({
       id: zod.number(),
@@ -466,6 +484,10 @@ export const GetAdminCommandesResponseItem = zod.object({
     "livree",
     "annulee",
   ]),
+  nomLivraison: zod.string().optional(),
+  telephone: zod.string().optional(),
+  adresse: zod.string().optional(),
+  wilaya: zod.string().optional(),
   items: zod.array(
     zod.object({
       id: zod.number(),
@@ -528,6 +550,10 @@ export const UpdateStatutCommandeResponse = zod.object({
     "livree",
     "annulee",
   ]),
+  nomLivraison: zod.string().optional(),
+  telephone: zod.string().optional(),
+  adresse: zod.string().optional(),
+  wilaya: zod.string().optional(),
   items: zod.array(
     zod.object({
       id: zod.number(),
@@ -586,6 +612,10 @@ export const GetAdminStatsResponse = zod.object({
         "livree",
         "annulee",
       ]),
+      nomLivraison: zod.string().optional(),
+      telephone: zod.string().optional(),
+      adresse: zod.string().optional(),
+      wilaya: zod.string().optional(),
       items: zod.array(
         zod.object({
           id: zod.number(),

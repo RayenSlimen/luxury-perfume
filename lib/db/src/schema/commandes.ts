@@ -11,6 +11,10 @@ export const commandesTable = pgTable("commandes", {
     .references(() => utilisateursTable.id, { onDelete: "cascade" }),
   total: numeric("total", { precision: 10, scale: 2 }).notNull(),
   statut: text("statut").notNull().default("en_attente"),
+  nomLivraison: text("nom_livraison"),
+  telephone: text("telephone"),
+  adresse: text("adresse"),
+  wilaya: text("wilaya"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

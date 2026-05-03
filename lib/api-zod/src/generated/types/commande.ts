@@ -14,6 +14,10 @@ export interface Commande {
   userId: number;
   total: number;
   statut: CommandeStatut;
+  nomLivraison?: string;
+  telephone?: string;
+  adresse?: string;
+  wilaya?: string;
   items: CommandeItem[];
   utilisateur?: Utilisateur;
   createdAt: Date;

@@ -29,6 +29,10 @@ async function buildCommande(commandeId: number) {
     userId: commande.userId,
     total: parseFloat(commande.total),
     statut: commande.statut,
+    nomLivraison: commande.nomLivraison ?? undefined,
+    telephone: commande.telephone ?? undefined,
+    adresse: commande.adresse ?? undefined,
+    wilaya: commande.wilaya ?? undefined,
     createdAt: commande.createdAt,
     utilisateur: user
       ? { id: user.id, nom: user.nom, email: user.email, role: user.role, createdAt: user.createdAt }
@@ -66,6 +70,17 @@ router.get("/commandes", requireAuth, async (req, res): Promise<void> => {
 
 router.post("/commandes", requireAuth, async (req, res): Promise<void> => {
   const userId = req.user!.id;
+  const { nomLivraison, telephone, adresse, wilaya } = req.body as {
+    nomLivraison?: string;
+    telephone?: string;
+    adresse?: string;
+    wilaya?: string;
+  };
+
+  if (!nomLivraison || !telephone || !adresse || !wilaya) {
+    res.status(400).json({ message: "Informations de livraison incomplètes" });
+    return;
+  }
 
   const panierItems = await db
     .select()
@@ -85,7 +100,7 @@ router.post("/commandes", requireAuth, async (req, res): Promise<void> => {
 
   const [commande] = await db
     .insert(commandesTable)
-    .values({ userId, total: String(total), statut: "en_attente" })
+    .values({ userId, total: String(total), statut: "en_attente", nomLivraison, telephone, adresse, wilaya })
     .returning();
 
   await db.insert(commandeItemsTable).values(

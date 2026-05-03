@@ -439,6 +439,12 @@ paths:
       summary: Place an order from current cart
       security:
         - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasserCommandeBody"
       responses:
         "201":
           description: Order created
@@ -749,6 +755,19 @@ components:
           $ref: "#/components/schemas/Produit"
       required: [id, produitId, quantite, prixUnitaire, produit]
 
+    PasserCommandeBody:
+      type: object
+      properties:
+        nomLivraison:
+          type: string
+        telephone:
+          type: string
+        adresse:
+          type: string
+        wilaya:
+          type: string
+      required: [nomLivraison, telephone, adresse, wilaya]
+
     Commande:
       type: object
       properties:
@@ -761,6 +780,14 @@ components:
         statut:
           type: string
           enum: [en_attente, confirmee, expediee, livree, annulee]
+        nomLivraison:
+          type: string
+        telephone:
+          type: string
+        adresse:
+          type: string
+        wilaya:
+          type: string
         items:
           type: array
           items:

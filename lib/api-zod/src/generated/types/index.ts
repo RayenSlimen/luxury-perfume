@@ -24,6 +24,7 @@ export * from "./modifierQuantiteBody";
 export * from "./panier";
 export * from "./panierItem";
 export * from "./panierItemBody";
+export * from "./passerCommandeBody";
 export * from "./produit";
 export * from "./produitBody";
 export * from "./produitBodyCategorie";

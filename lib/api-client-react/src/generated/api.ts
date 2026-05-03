@@ -29,6 +29,7 @@ import type {
   ModifierQuantiteBody,
   Panier,
   PanierItemBody,
+  PasserCommandeBody,
   Produit,
   ProduitBody,
   ProduitsPage,
@@ -1593,11 +1594,14 @@ export const getPasserCommandeUrl = () => {
 };
 
 export const passerCommande = async (
+  passerCommandeBody: PasserCommandeBody,
   options?: RequestInit,
 ): Promise<Commande> => {
   return customFetch<Commande>(getPasserCommandeUrl(), {
     ...options,
     method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(passerCommandeBody),
   });
 };
 
@@ -1608,14 +1612,14 @@ export const getPasserCommandeMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof passerCommande>>,
     TError,
-    void,
+    { data: BodyType<PasserCommandeBody> },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof passerCommande>>,
   TError,
-  void,
+  { data: BodyType<PasserCommandeBody> },
   TContext
 > => {
   const mutationKey = ["passerCommande"];
@@ -1629,9 +1633,11 @@ export const getPasserCommandeMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof passerCommande>>,
-    void
-  > = () => {
-    return passerCommande(requestOptions);
+    { data: BodyType<PasserCommandeBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return passerCommande(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -1640,7 +1646,7 @@ export const getPasserCommandeMutationOptions = <
 export type PasserCommandeMutationResult = NonNullable<
   Awaited<ReturnType<typeof passerCommande>>
 >;
-
+export type PasserCommandeMutationBody = BodyType<PasserCommandeBody>;
 export type PasserCommandeMutationError = ErrorType<unknown>;
 
 /**
@@ -1653,14 +1659,14 @@ export const usePasserCommande = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof passerCommande>>,
     TError,
-    void,
+    { data: BodyType<PasserCommandeBody> },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationResult<
   Awaited<ReturnType<typeof passerCommande>>,
   TError,
-  void,
+  { data: BodyType<PasserCommandeBody> },
   TContext
 > => {
   return useMutation(getPasserCommandeMutationOptions(options));
