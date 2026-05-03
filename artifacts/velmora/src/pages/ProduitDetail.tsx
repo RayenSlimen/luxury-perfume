@@ -109,12 +109,6 @@ export default function ProduitDetail() {
                 homme: 'Pour Lui',
                 femme: 'Pour Elle',
                 unisexe: 'Unisexe',
-                oriental: 'Oriental',
-                floral: 'Floral',
-                boise: 'Boisé',
-                aquatique: 'Aquatique',
-                gourmand: 'Gourmand',
-                citrus: 'Citrus',
               }[produit.categorie] ?? produit.categorie}
             </p>
             <h1 className="font-serif text-4xl md:text-6xl text-foreground mb-6 leading-tight">

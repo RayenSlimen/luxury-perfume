@@ -48,8 +48,6 @@ type Section =
 
 const CATEGORIES_MAP: Record<string, string> = {
   homme: "Pour Lui", femme: "Pour Elle", unisexe: "Unisexe",
-  oriental: "Oriental", floral: "Floral", boise: "Boisé",
-  aquatique: "Aquatique", gourmand: "Gourmand", citrus: "Citrus",
 };
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
