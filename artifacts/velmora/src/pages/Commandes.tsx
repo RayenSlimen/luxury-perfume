@@ -26,7 +26,7 @@ export default function Commandes() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'en_attente':
-        return <Badge className="bg-amber-500/20 text-amber-500 border-amber-500/50 rounded-none font-normal tracking-wider uppercase text-[10px]">En attente</Badge>;
+        return <Badge className="bg-white/10 text-white/70 border-white/30 rounded-none font-normal tracking-wider uppercase text-[10px]">En attente</Badge>;
       case 'confirmee':
         return <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/50 rounded-none font-normal tracking-wider uppercase text-[10px]">Confirmée</Badge>;
       case 'expediee':
