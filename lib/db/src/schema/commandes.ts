@@ -7,7 +7,6 @@ import { produitsTable } from "./produits";
 export const commandesTable = pgTable("commandes", {
   id: serial("id").primaryKey(),
   userId: integer("user_id")
-    .notNull()
     .references(() => utilisateursTable.id, { onDelete: "cascade" }),
   total: numeric("total", { precision: 10, scale: 2 }).notNull(),
   statut: text("statut").notNull().default("en_attente"),

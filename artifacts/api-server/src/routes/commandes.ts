@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, commandesTable, commandeItemsTable, panierItemsTable, produitsTable, utilisateursTable } from "@workspace/db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, inArray } from "drizzle-orm";
 import { requireAuth } from "../middlewares/auth";
 
 const router: IRouter = Router();
@@ -13,10 +13,14 @@ async function buildCommande(commandeId: number) {
 
   if (!commande) return null;
 
-  const [user] = await db
-    .select()
-    .from(utilisateursTable)
-    .where(eq(utilisateursTable.id, commande.userId));
+  let user = undefined;
+  if (commande.userId) {
+    const [u] = await db
+      .select()
+      .from(utilisateursTable)
+      .where(eq(utilisateursTable.id, commande.userId));
+    if (u) user = { id: u.id, nom: u.nom, email: u.email, role: u.role, createdAt: u.createdAt };
+  }
 
   const items = await db
     .select()
@@ -26,7 +30,7 @@ async function buildCommande(commandeId: number) {
 
   return {
     id: commande.id,
-    userId: commande.userId,
+    userId: commande.userId ?? 0,
     total: parseFloat(commande.total),
     statut: commande.statut,
     nomLivraison: commande.nomLivraison ?? undefined,
@@ -34,9 +38,7 @@ async function buildCommande(commandeId: number) {
     adresse: commande.adresse ?? undefined,
     wilaya: commande.wilaya ?? undefined,
     createdAt: commande.createdAt,
-    utilisateur: user
-      ? { id: user.id, nom: user.nom, email: user.email, role: user.role, createdAt: user.createdAt }
-      : undefined,
+    utilisateur: user,
     items: items.map((row) => ({
       id: row.commande_items.id,
       produitId: row.commande_items.produitId,
@@ -68,13 +70,13 @@ router.get("/commandes", requireAuth, async (req, res): Promise<void> => {
   res.json(results.filter(Boolean));
 });
 
-router.post("/commandes", requireAuth, async (req, res): Promise<void> => {
-  const userId = req.user!.id;
-  const { nomLivraison, telephone, adresse, wilaya } = req.body as {
+router.post("/commandes", async (req, res): Promise<void> => {
+  const { nomLivraison, telephone, adresse, wilaya, items } = req.body as {
     nomLivraison?: string;
     telephone?: string;
     adresse?: string;
     wilaya?: string;
+    items?: { produitId: number; quantite: number }[];
   };
 
   if (!nomLivraison || !telephone || !adresse || !wilaya) {
@@ -82,37 +84,68 @@ router.post("/commandes", requireAuth, async (req, res): Promise<void> => {
     return;
   }
 
-  const panierItems = await db
-    .select()
-    .from(panierItemsTable)
-    .innerJoin(produitsTable, eq(panierItemsTable.produitId, produitsTable.id))
-    .where(eq(panierItemsTable.userId, userId));
+  // Determine userId if authenticated
+  const userId: number | null = (req as any).user?.id ?? null;
 
-  if (panierItems.length === 0) {
+  // Get items: from body (guest) or DB cart (logged-in)
+  let orderItems: { produitId: number; quantite: number }[] = [];
+
+  if (items && items.length > 0) {
+    orderItems = items;
+  } else if (userId) {
+    const panierItems = await db
+      .select()
+      .from(panierItemsTable)
+      .where(eq(panierItemsTable.userId, userId));
+    orderItems = panierItems.map((p) => ({ produitId: p.produitId, quantite: p.quantite }));
+  }
+
+  if (orderItems.length === 0) {
     res.status(400).json({ message: "Votre panier est vide" });
     return;
   }
 
-  const total = panierItems.reduce(
-    (sum, row) => sum + parseFloat(row.produits.prix) * row.panier_items.quantite,
+  // Fetch real prices from DB
+  const produitIds = orderItems.map((i) => i.produitId);
+  const produits = await db
+    .select()
+    .from(produitsTable)
+    .where(inArray(produitsTable.id, produitIds));
+
+  const prixMap: Record<number, number> = {};
+  for (const p of produits) prixMap[p.id] = parseFloat(p.prix);
+
+  const total = orderItems.reduce(
+    (sum, item) => sum + (prixMap[item.produitId] ?? 0) * item.quantite,
     0
   );
 
   const [commande] = await db
     .insert(commandesTable)
-    .values({ userId, total: String(total), statut: "en_attente", nomLivraison, telephone, adresse, wilaya })
+    .values({
+      userId: userId ?? undefined,
+      total: String(total),
+      statut: "en_attente",
+      nomLivraison,
+      telephone,
+      adresse,
+      wilaya,
+    })
     .returning();
 
   await db.insert(commandeItemsTable).values(
-    panierItems.map((row) => ({
+    orderItems.map((item) => ({
       commandeId: commande.id,
-      produitId: row.panier_items.produitId,
-      quantite: row.panier_items.quantite,
-      prixUnitaire: row.produits.prix,
+      produitId: item.produitId,
+      quantite: item.quantite,
+      prixUnitaire: String(prixMap[item.produitId] ?? 0),
     }))
   );
 
-  await db.delete(panierItemsTable).where(eq(panierItemsTable.userId, userId));
+  // Clear server cart if logged in
+  if (userId) {
+    await db.delete(panierItemsTable).where(eq(panierItemsTable.userId, userId));
+  }
 
   const result = await buildCommande(commande.id);
   res.status(201).json(result);

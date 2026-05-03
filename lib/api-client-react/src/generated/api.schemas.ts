@@ -138,11 +138,17 @@ export interface CommandeItem {
   produit: Produit;
 }
 
+export type PasserCommandeBodyItemsItem = {
+  produitId: number;
+  quantite: number;
+};
+
 export interface PasserCommandeBody {
   nomLivraison: string;
   telephone: string;
   adresse: string;
   wilaya: string;
+  items: PasserCommandeBodyItemsItem[];
 }
 
 export type CommandeStatut =

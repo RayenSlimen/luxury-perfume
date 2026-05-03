@@ -1,14 +1,18 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { useAuth } from "./auth";
 import { useGetPanier, useAjouterAuPanier, useModifierQuantite, useSupprimerDuPanier, useViderPanier, getGetPanierQueryKey } from "@workspace/api-client-react";
-import type { Panier, PanierItem } from "@workspace/api-client-react";
+import type { Panier, Produit } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 
-interface LocalCartItem extends PanierItem {}
+interface LocalCartItem {
+  produitId: number;
+  quantite: number;
+  produit: Produit;
+}
 
 interface CartContextType {
   cart: Panier | null;
-  addToCart: (produitId: number, quantite?: number) => Promise<void>;
+  addToCart: (produitId: number, quantite?: number, produit?: Produit) => Promise<void>;
   updateQuantity: (produitId: number, quantite: number) => Promise<void>;
   removeFromCart: (produitId: number) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -17,26 +21,35 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const STORAGE_KEY = "velmora_cart";
+
+function loadLocalCart(): LocalCartItem[] {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveLocalCart(items: LocalCartItem[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const { token } = useAuth();
   const queryClient = useQueryClient();
-  
-  // Local state for guest users
-  const [localCart, setLocalCart] = useState<LocalCartItem[]>(() => {
-    const saved = localStorage.getItem("velmora_cart");
-    return saved ? JSON.parse(saved) : [];
-  });
+
+  const [localCart, setLocalCart] = useState<LocalCartItem[]>(loadLocalCart);
 
   useEffect(() => {
     if (!token) {
-      localStorage.setItem("velmora_cart", JSON.stringify(localCart));
+      saveLocalCart(localCart);
     }
   }, [localCart, token]);
 
   const { data: serverCart, isLoading: isLoadingServer } = useGetPanier({
-    query: {
-      enabled: !!token,
-    }
+    query: { enabled: !!token },
   });
 
   const addMutation = useAjouterAuPanier();
@@ -44,27 +57,42 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const removeMutation = useSupprimerDuPanier();
   const clearMutation = useViderPanier();
 
-  const addToCart = async (produitId: number, quantite = 1) => {
+  const addToCart = async (produitId: number, quantite = 1, produit?: Produit) => {
     if (token) {
       await addMutation.mutateAsync({ data: { produitId, quantite } });
       queryClient.invalidateQueries({ queryKey: getGetPanierQueryKey() });
     } else {
-      setLocalCart(prev => {
-        const existing = prev.find(item => item.produitId === produitId);
+      setLocalCart((prev) => {
+        const existing = prev.find((item) => item.produitId === produitId);
         if (existing) {
-          return prev.map(item => item.produitId === produitId ? { ...item, quantite: item.quantite + quantite } : item);
+          return prev.map((item) =>
+            item.produitId === produitId
+              ? { ...item, quantite: item.quantite + quantite }
+              : item
+          );
         }
-        return [...prev, { produitId, quantite, produit: {} as any }]; // Local mock won't have full product data easily, this is a simplified version
+        const newItem: LocalCartItem = {
+          produitId,
+          quantite,
+          produit: produit ?? ({ id: produitId, prix: 0, nom: "", description: "", imageUrl: "", categorie: "unisexe" as const, enVedette: false, nombreVentes: 0, createdAt: new Date().toISOString() }),
+        };
+        return [...prev, newItem];
       });
     }
   };
 
   const updateQuantity = async (produitId: number, quantite: number) => {
     if (token) {
-      await updateMutation.mutateAsync({ id: produitId, data: { quantite } } as any); // Note: path param in generated hooks might be different, check signature
+      await updateMutation.mutateAsync({ id: produitId, data: { quantite } } as any);
       queryClient.invalidateQueries({ queryKey: getGetPanierQueryKey() });
     } else {
-      setLocalCart(prev => prev.map(item => item.produitId === produitId ? { ...item, quantite } : item));
+      if (quantite <= 0) {
+        setLocalCart((prev) => prev.filter((item) => item.produitId !== produitId));
+      } else {
+        setLocalCart((prev) =>
+          prev.map((item) => (item.produitId === produitId ? { ...item, quantite } : item))
+        );
+      }
     }
   };
 
@@ -73,7 +101,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       await removeMutation.mutateAsync({ id: produitId } as any);
       queryClient.invalidateQueries({ queryKey: getGetPanierQueryKey() });
     } else {
-      setLocalCart(prev => prev.filter(item => item.produitId !== produitId));
+      setLocalCart((prev) => prev.filter((item) => item.produitId !== produitId));
     }
   };
 
@@ -83,20 +111,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
       queryClient.invalidateQueries({ queryKey: getGetPanierQueryKey() });
     } else {
       setLocalCart([]);
+      localStorage.removeItem(STORAGE_KEY);
     }
   };
 
-  // Simplified local cart representation
   const computedLocalCart: Panier = {
     items: localCart,
-    total: localCart.reduce((sum, item) => sum + (item.produit?.prix || 0) * item.quantite, 0),
-    nombreArticles: localCart.reduce((sum, item) => sum + item.quantite, 0)
+    total: localCart.reduce((sum, item) => sum + (item.produit?.prix ?? 0) * item.quantite, 0),
+    nombreArticles: localCart.reduce((sum, item) => sum + item.quantite, 0),
   };
 
   return (
     <CartContext.Provider
       value={{
-        cart: token ? (serverCart || { items: [], total: 0, nombreArticles: 0 }) : computedLocalCart,
+        cart: token ? serverCart ?? { items: [], total: 0, nombreArticles: 0 } : computedLocalCart,
         addToCart,
         updateQuantity,
         removeFromCart,

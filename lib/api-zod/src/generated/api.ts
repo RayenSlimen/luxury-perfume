@@ -415,6 +415,12 @@ export const PasserCommandeBody = zod.object({
   telephone: zod.string(),
   adresse: zod.string(),
   wilaya: zod.string(),
+  items: zod.array(
+    zod.object({
+      produitId: zod.number(),
+      quantite: zod.number(),
+    }),
+  ),
 });
 
 /**

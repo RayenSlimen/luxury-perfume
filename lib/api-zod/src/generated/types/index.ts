@@ -25,6 +25,7 @@ export * from "./panier";
 export * from "./panierItem";
 export * from "./panierItemBody";
 export * from "./passerCommandeBody";
+export * from "./passerCommandeBodyItemsItem";
 export * from "./produit";
 export * from "./produitBody";
 export * from "./produitBodyCategorie";

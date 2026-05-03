@@ -1,6 +1,5 @@
 import { PageTransition } from "@/components/layout/PageTransition";
 import { useCart } from "@/lib/cart";
-import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Trash2, Loader2, ChevronDown } from "lucide-react";
 import { Link, useLocation } from "wouter";
@@ -26,7 +25,6 @@ interface LivraisonForm {
 
 export default function Panier() {
   const { cart, updateQuantity, removeFromCart, clearCart, isLoading } = useCart();
-  const { user } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const passerCommande = usePasserCommande();
@@ -50,16 +48,15 @@ export default function Panier() {
     return Object.keys(e).length === 0;
   };
 
-  const handleOpenCheckout = () => {
-    if (!user) { setLocation("/connexion"); return; }
-    setShowDialog(true);
-  };
-
   const handleSubmit = async () => {
     if (!validate()) return;
     setIsOrdering(true);
     try {
-      await passerCommande.mutateAsync({ data: form });
+      const items = (cart?.items ?? []).map((item) => ({
+        produitId: item.produitId,
+        quantite: item.quantite,
+      }));
+      await passerCommande.mutateAsync({ data: { ...form, items } });
       await clearCart();
       setShowDialog(false);
       toast({
@@ -67,7 +64,7 @@ export default function Panier() {
         description: "Votre commande a été passée avec succès.",
         className: "bg-card border-primary text-foreground rounded-none",
       });
-      setLocation("/commandes");
+      setLocation("/");
     } catch {
       toast({
         title: "Erreur",
@@ -152,7 +149,7 @@ export default function Panier() {
                       <p className="text-xs text-muted-foreground tracking-widest uppercase mb-2">
                         {item.produit?.categorie === "homme" ? "Pour Lui" : item.produit?.categorie === "femme" ? "Pour Elle" : "Unisexe"}
                       </p>
-                      <p className="md:hidden text-primary mt-2">{(item.produit?.prix || 0).toFixed(2)} €</p>
+                      <p className="md:hidden text-primary mt-2">{(item.produit?.prix || 0).toFixed(2)} DT</p>
                     </div>
                   </div>
 
@@ -175,7 +172,7 @@ export default function Panier() {
                   </div>
 
                   <div className="hidden md:block col-span-2 text-right">
-                    <p className="text-foreground">{(item.produit?.prix || 0).toFixed(2)} €</p>
+                    <p className="text-foreground">{(item.produit?.prix || 0).toFixed(2)} DT</p>
                   </div>
 
                   <div className="col-span-1 flex justify-end md:justify-center">
@@ -197,7 +194,7 @@ export default function Panier() {
                 <div className="space-y-4 mb-8">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Sous-total</span>
-                    <span>{total.toFixed(2)} €</span>
+                    <span>{total.toFixed(2)} DT</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Livraison</span>
@@ -205,19 +202,19 @@ export default function Panier() {
                   </div>
                   <div className="flex justify-between items-center pt-4 border-t border-border/50">
                     <span className="font-serif text-lg">Total</span>
-                    <span className="font-serif text-xl text-primary">{total.toFixed(2)} €</span>
+                    <span className="font-serif text-xl text-primary">{total.toFixed(2)} DT</span>
                   </div>
                 </div>
 
                 <Button
-                  onClick={handleOpenCheckout}
+                  onClick={() => setShowDialog(true)}
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-none h-14 text-sm tracking-widest uppercase mb-4"
                 >
-                  {user ? "Commander" : "Se connecter pour commander"}
+                  Commander
                 </Button>
 
                 <div className="text-center">
-                  <p className="text-xs text-muted-foreground">Taxes incluses. Échantillon offert inclus.</p>
+                  <p className="text-xs text-muted-foreground">Livraison gratuite. Paiement à la livraison.</p>
                 </div>
               </div>
             </div>
@@ -228,13 +225,11 @@ export default function Panier() {
       {/* ── Checkout Dialog ── */}
       {showDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={() => !isOrdering && setShowDialog(false)}
           />
 
-          {/* Modal */}
           <div className="relative bg-card border border-border w-full max-w-lg max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div className="flex items-center justify-between px-8 py-6 border-b border-border">
@@ -253,7 +248,7 @@ export default function Panier() {
               {field("telephone", "Numéro de téléphone", "tel", "ex: 20 123 456")}
               {field("adresse", "Adresse", "text", "Rue, numéro, appartement...")}
 
-              {/* Wilaya select */}
+              {/* Wilaya */}
               <div className="flex flex-col gap-1">
                 <label className="text-xs tracking-widest uppercase text-muted-foreground">Wilaya</label>
                 <div className="relative">
@@ -273,11 +268,11 @@ export default function Panier() {
               </div>
             </div>
 
-            {/* Order summary in dialog */}
+            {/* Order total */}
             <div className="px-8 pb-2">
               <div className="bg-background border border-border/50 px-6 py-4 flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Total commande</span>
-                <span className="font-serif text-lg text-primary">{total.toFixed(2)} €</span>
+                <span className="font-serif text-lg text-primary">{total.toFixed(2)} DT</span>
               </div>
             </div>
 

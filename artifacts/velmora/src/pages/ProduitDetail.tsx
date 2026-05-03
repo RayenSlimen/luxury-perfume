@@ -57,7 +57,7 @@ export default function ProduitDetail() {
   const handleAdd = async () => {
     setIsAdding(true);
     try {
-      await addToCart(produit.id, quantite);
+      await addToCart(produit.id, quantite, produit);
       toast({
         title: "Ajouté au panier",
         description: `${quantite}x ${produit.nom} ajouté avec succès.`,

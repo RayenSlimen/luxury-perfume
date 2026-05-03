@@ -5,10 +5,12 @@
  * Velmora Luxury Perfume E-Commerce API
  * OpenAPI spec version: 0.1.0
  */
+import type { PasserCommandeBodyItemsItem } from "./passerCommandeBodyItemsItem";
 
 export interface PasserCommandeBody {
   nomLivraison: string;
   telephone: string;
   adresse: string;
   wilaya: string;
+  items: PasserCommandeBodyItemsItem[];
 }
