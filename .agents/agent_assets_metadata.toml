@@ -1,5 +1,4 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "jTN66yt-5ujQLr2JnrWxC"
@@ -24,3 +23,33 @@ id = "EdiZ7TlwY9X3nQk3aeAcf"
 uri = "file://artifacts/velmora/public/images/hero.png"
 type = "image"
 title = "Luxury perfume hero banner"
+
+[[outputs]]
+id = "u2KLo8t4P3vILwR_WogIm"
+uri = "file://exports/utilisateurs.csv"
+type = "table"
+title = "utilisateurs.csv — المستخدمون"
+
+[[outputs]]
+id = "svNvx-R1LR04AeffFCNhI"
+uri = "file://exports/produits.csv"
+type = "table"
+title = "produits.csv — المنتجات (25 منتج)"
+
+[[outputs]]
+id = "uzMgK4rgO9Yo8BK6os2dk"
+uri = "file://exports/commandes.csv"
+type = "table"
+title = "commandes.csv — الطلبيات"
+
+[[outputs]]
+id = "9eSlxxo120z1nta6QI8CQ"
+uri = "file://exports/commande_items.csv"
+type = "table"
+title = "commande_items.csv — تفاصيل الطلبيات"
+
+[[outputs]]
+id = "ch3T8xHVtJmuQ5tsc6YAb"
+uri = "file://exports/panier_items.csv"
+type = "table"
+title = "panier_items.csv — سلة التسوق"

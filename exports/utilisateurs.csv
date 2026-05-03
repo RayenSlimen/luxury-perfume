@@ -1,0 +1,3 @@
+id,nom,email,mot_de_passe,role,created_at
+1,Administrateur Velmora,admin@velmora.fr,$2b$12$4BJecpaVYEivpu76Lj6NZ.IVpG.HsfBCmA82RsBBGYRTJJzu4wWOq,admin,2026-05-03 00:11:47.520048+00
+2,Sophie Laurent,sophie@example.fr,$2b$12$g1wiUp7nnbfaiEx.ZgWhkOP5ByWJGZJbUCS.pJi/E/52P0afrZ7eG,client,2026-05-03 00:11:47.520048+00
