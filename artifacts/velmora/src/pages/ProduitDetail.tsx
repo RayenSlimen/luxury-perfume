@@ -1,13 +1,19 @@
 import { PageTransition } from "@/components/layout/PageTransition";
 import { useGetProduit, useGetProduitsSimilaires } from "@workspace/api-client-react";
 import { useRoute } from "wouter";
-import { Loader2, Plus, Minus, ArrowLeft } from "lucide-react";
+import { Loader2, Plus, Minus, ArrowLeft, Truck, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useCart } from "@/lib/cart";
 import { useToast } from "@/hooks/use-toast";
 import { ProductCard } from "@/components/ProductCard";
 import { Link } from "wouter";
+
+const VOLUMES = [
+  { label: "50 ml", multiplier: 1 },
+  { label: "100 ml", multiplier: 1.65 },
+] as const;
+type VolumeLabel = typeof VOLUMES[number]["label"];
 
 export default function ProduitDetail() {
   const [, params] = useRoute("/produits/:id");
@@ -21,6 +27,7 @@ export default function ProduitDetail() {
     query: { enabled: !!id }
   });
 
+  const [volume, setVolume] = useState<VolumeLabel>("50 ml");
   const [quantite, setQuantite] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const { addToCart } = useCart();
@@ -68,6 +75,8 @@ export default function ProduitDetail() {
     }
   };
 
+  const selectedVolume = VOLUMES.find(v => v.label === volume)!;
+  const prixAffiche = (produit.prix * selectedVolume.multiplier).toFixed(2);
   const imageUrl = produit.imageUrl || "/images/perfume-1.png";
 
   return (
@@ -102,11 +111,39 @@ export default function ProduitDetail() {
               {produit.nom}
             </h1>
             <p className="text-2xl text-foreground/90 font-medium mb-8">
-              {produit.prix.toFixed(2)} €
+              {prixAffiche} €
             </p>
+
+            {/* Volume selector */}
+            <div className="mb-8">
+              <p className="text-muted-foreground uppercase tracking-widest text-xs mb-3">
+                Contenance
+              </p>
+              <div className="flex gap-3">
+                {VOLUMES.map(v => (
+                  <button
+                    key={v.label}
+                    onClick={() => setVolume(v.label)}
+                    className={`h-12 px-6 border text-sm tracking-widest uppercase transition-colors ${
+                      volume === v.label
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                    }`}
+                  >
+                    {v.label}
+                  </button>
+                ))}
+              </div>
+            </div>
             
             <div className="prose prose-invert prose-p:text-muted-foreground prose-p:leading-relaxed mb-10 max-w-none">
               <p>{produit.description}</p>
+            </div>
+
+            {/* Livraison gratuite badge */}
+            <div className="flex items-center gap-2 mb-6 text-sm text-foreground/70">
+              <Truck className="w-4 h-4 text-primary shrink-0" />
+              <span>Livraison gratuite — <span className="text-foreground">2 à 3 jours ouvrés</span></span>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center pt-8 border-t border-border">
@@ -137,16 +174,10 @@ export default function ProduitDetail() {
                 {isAdding ? "Ajout en cours..." : "Ajouter au panier"}
               </Button>
             </div>
-            
-            <div className="mt-12 space-y-4">
-              <div className="flex items-center justify-between py-4 border-b border-border/50 text-sm">
-                <span className="text-muted-foreground uppercase tracking-widest">Contenance</span>
-                <span className="text-foreground font-medium">100ml / 3.4 FL. OZ.</span>
-              </div>
-              <div className="flex items-center justify-between py-4 border-b border-border/50 text-sm">
-                <span className="text-muted-foreground uppercase tracking-widest">Livraison</span>
-                <span className="text-foreground font-medium">Offerte (2-3 jours)</span>
-              </div>
+
+            <div className="mt-10 flex items-center gap-2 text-xs text-muted-foreground">
+              <Package className="w-4 h-4 shrink-0" />
+              <span>Échantillon offert avec chaque commande</span>
             </div>
           </div>
         </div>
