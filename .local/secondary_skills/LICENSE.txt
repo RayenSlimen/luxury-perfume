@@ -1,0 +1,21 @@
+Copyright (c) 2026 luxury-perfume, Inc. All rights reserved.
+
+The contents of this directory are proprietary to luxury-perfume, Inc. and are
+licensed for use solely within the luxury-perfume platform under the applicable
+luxury-perfume user terms. Use of the contents of this directory within the
+luxury-perfume platform, including by luxury-perfume users for commercial purposes, is
+unlimited and expressly permitted.
+
+Outside of the luxury-perfume platform, the contents of this directory are
+licensed under the Creative Commons Attribution-NonCommercial 4.0
+International License (CC BY-NC 4.0). You may obtain a copy of that
+license at:
+https://creativecommons.org/licenses/by-nc/4.0/
+
+Under CC BY-NC 4.0, you may share and adapt the contents of this
+directory for non-commercial purposes, provided you appropriately credit
+luxury-perfume, Inc. and indicate if changes were made. Commercial use of the
+contents of this directory outside of the luxury-perfume platform is strictly
+prohibited without a separate license from luxury-perfume, Inc.
+
+For commercial licensing inquiries, contact: support@luxury-perfume.com

@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { useCart } from "@/lib/cart";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { formatPrice } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Produit;
@@ -58,7 +59,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="p-6 flex flex-col grow justify-between">
           <div>
             <p className="text-xs text-muted-foreground tracking-widest uppercase mb-2">
-              {product.categorie === 'homme' ? 'Pour Lui' : product.categorie === 'femme' ? 'Pour Elle' : 'Unisexe'}
+              {product.categorie === 'homme' ? 'Pour Homme' : product.categorie === 'femme' ? 'Pour Femme' : 'Unisexe'}
             </p>
             <h3 className="font-serif text-xl text-foreground mb-1 group-hover:text-primary transition-colors">
               {product.nom}
@@ -66,7 +67,7 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
           <div className="mt-4 pt-4 border-t border-border/50 flex justify-between items-center">
             <p className="text-primary font-medium tracking-wide">
-              {product.prix.toFixed(2)} €
+              {formatPrice(product.prix)}
             </p>
           </div>
         </div>

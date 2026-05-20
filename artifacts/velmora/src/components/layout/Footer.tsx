@@ -24,12 +24,12 @@ export function Footer() {
             <ul className="space-y-4">
               <li>
                 <Link href="/produits?categorie=femme">
-                  <span className="text-muted-foreground hover:text-primary transition-colors cursor-pointer text-sm">Pour Elle</span>
+                  <span className="text-muted-foreground hover:text-primary transition-colors cursor-pointer text-sm">Pour Femme</span>
                 </Link>
               </li>
               <li>
                 <Link href="/produits?categorie=homme">
-                  <span className="text-muted-foreground hover:text-primary transition-colors cursor-pointer text-sm">Pour Lui</span>
+                  <span className="text-muted-foreground hover:text-primary transition-colors cursor-pointer text-sm">Pour Homme</span>
                 </Link>
               </li>
               <li>

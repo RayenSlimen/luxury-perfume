@@ -33,6 +33,7 @@ import { Badge } from "@/components/ui/badge";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { formatPrice } from "@/lib/utils";
 
 type CalcState = {
   deliveryCost: number; returnCost: number; fulfillmentCost: number;
@@ -47,7 +48,7 @@ type Section =
   | "boutique-theme" | "boutique-params" | "boutique-facturation";
 
 const CATEGORIES_MAP: Record<string, string> = {
-  homme: "Pour Lui", femme: "Pour Elle", unisexe: "Unisexe",
+  homme: "Pour Homme", femme: "Pour Femme", unisexe: "Unisexe",
 };
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
@@ -425,10 +426,10 @@ function DashboardSection({ setSection }: { setSection: (s: Section) => void }) 
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Commandes aujourd'hui" value={`${(today?.reduce((s, c) => s + Number(c.total), 0) || 0).toFixed(2)} €`} icon={ShoppingCart} accent="text-blue-400" />
-        <StatCard label="Commandes cette semaine" value={`${(thisWeek?.reduce((s, c) => s + Number(c.total), 0) || 0).toFixed(2)} €`} icon={TrendingUp} accent="text-green-400" />
-        <StatCard label="Commandes ce mois" value={`${(commandes?.reduce((s, c) => s + Number(c.total), 0) || 0).toFixed(2)} €`} icon={BarChart2} accent="text-purple-400" />
-        <StatCard label="Chiffre d'affaires total" value={`${(stats?.chiffreAffaires || 0).toFixed(2)} €`} icon={Wallet} accent="text-primary" />
+        <StatCard label="Commandes aujourd'hui" value={`${formatPrice((today?.reduce((s, c) => s + Number(c.total), 0) || 0))}`} icon={ShoppingCart} accent="text-blue-400" />
+        <StatCard label="Commandes cette semaine" value={`${formatPrice((thisWeek?.reduce((s, c) => s + Number(c.total), 0) || 0))}`} icon={TrendingUp} accent="text-green-400" />
+        <StatCard label="Commandes ce mois" value={`${formatPrice((commandes?.reduce((s, c) => s + Number(c.total), 0) || 0))}`} icon={BarChart2} accent="text-purple-400" />
+        <StatCard label="Chiffre d'affaires total" value={`${formatPrice((stats?.chiffreAffaires || 0))}`} icon={Wallet} accent="text-primary" />
       </div>
 
       {/* Charts row */}
@@ -476,7 +477,7 @@ function DashboardSection({ setSection }: { setSection: (s: Section) => void }) 
         <StatCard label="Total commandes" value={stats?.totalCommandes || 0} icon={Package} />
         <StatCard label="Clients" value={stats?.totalClients || 0} icon={Users} accent="text-blue-400" />
         <StatCard label="Produits" value={stats?.totalProduits || 0} icon={ShoppingBag} accent="text-green-400" />
-        <StatCard label="Panier moyen" value={`${stats?.totalCommandes ? ((stats?.chiffreAffaires || 0) / stats.totalCommandes).toFixed(2) : "0.00"} €`} icon={TrendingUp} accent="text-purple-400" />
+        <StatCard label="Panier moyen" value={stats?.totalCommandes ? formatPrice((stats?.chiffreAffaires || 0) / stats.totalCommandes) : "0.000 DT"} icon={TrendingUp} accent="text-purple-400" />
       </div>
 
       {/* Recent orders preview */}
@@ -499,7 +500,7 @@ function DashboardSection({ setSection }: { setSection: (s: Section) => void }) 
                 <tr key={c.id} className="border-b border-border/20 hover:bg-white/3 transition-colors">
                   <td className="px-5 py-3 text-muted-foreground">#{c.id}</td>
                   <td className="px-5 py-3">{c.utilisateur?.nom ?? `Client #${c.userId}`}</td>
-                  <td className="px-5 py-3 text-primary font-medium">{Number(c.total).toFixed(2)} €</td>
+                  <td className="px-5 py-3 text-primary font-medium">{formatPrice(Number(c.total))}</td>
                   <td className="px-5 py-3">
                     <span className={`text-[10px] border px-2 py-1 uppercase tracking-widest ${STATUS_MAP[c.statut]?.color}`}>
                       {STATUS_MAP[c.statut]?.label ?? c.statut}
@@ -608,7 +609,7 @@ function CommandesSection({ filter, setFilter, queryClient, toast }: {
                       </SelectContent>
                     </Select>
                   </td>
-                  <td className="px-5 py-3 text-primary font-medium">{Number(c.total).toFixed(2)} €</td>
+                  <td className="px-5 py-3 text-primary font-medium">{formatPrice(Number(c.total))}</td>
                   <td className="px-5 py-3">
                     <button className="text-muted-foreground hover:text-foreground"><Eye className="w-4 h-4" /></button>
                   </td>
@@ -669,7 +670,7 @@ function ProduitsSection({ search, setSearch, editProduit, setEditProduit, isAdd
           <div>
             <p className="text-xs text-muted-foreground uppercase tracking-widest">Total Stock</p>
             <p className="text-xl font-serif">{data?.produits?.length ?? 0}</p>
-            <p className="text-xs text-muted-foreground">Valeur: {totalRevenue.toFixed(0)} €</p>
+            <p className="text-xs text-muted-foreground">Valeur: {formatPrice(totalRevenue)}</p>
           </div>
         </div>
         <div className="bg-card border border-border p-4 flex items-center gap-4">
@@ -677,14 +678,14 @@ function ProduitsSection({ search, setSearch, editProduit, setEditProduit, isAdd
           <div>
             <p className="text-xs text-muted-foreground uppercase tracking-widest">Stock endommagé</p>
             <p className="text-xl font-serif">0</p>
-            <p className="text-xs text-muted-foreground">Valeur: 0 €</p>
+            <p className="text-xs text-muted-foreground">Valeur: 0.000 DT</p>
           </div>
         </div>
         <div className="bg-card border border-border p-4 flex items-center gap-4">
           <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center"><TrendingUp className="w-5 h-5 text-green-400" /></div>
           <div>
             <p className="text-xs text-muted-foreground uppercase tracking-widest">Chiffre estimé</p>
-            <p className="text-xl font-serif text-green-400">{totalRevenue.toFixed(2)} €</p>
+            <p className="text-xl font-serif text-green-400">{formatPrice(totalRevenue)}</p>
           </div>
         </div>
       </div>
@@ -732,7 +733,7 @@ function ProduitsSection({ search, setSearch, editProduit, setEditProduit, isAdd
                     </div>
                   </td>
                   <td className="px-4 py-3 font-medium max-w-[160px] truncate">{p.nom}</td>
-                  <td className="px-4 py-3 text-primary">{Number(p.prix).toFixed(2)} €</td>
+                  <td className="px-4 py-3 text-primary">{formatPrice(Number(p.prix))}</td>
                   <td className="px-4 py-3">
                     <span className="text-[10px] border border-border px-2 py-0.5 uppercase tracking-widest text-muted-foreground">
                       {CATEGORIES_MAP[p.categorie] ?? p.categorie}
@@ -820,7 +821,7 @@ function ProduitDialog({ open, onClose, produit, queryClient, toast }: {
               {errors.nom && <p className="text-red-400 text-xs mt-1">{errors.nom.message}</p>}
             </div>
             <div>
-              <Label className="text-xs uppercase tracking-widest text-muted-foreground">Prix (€)</Label>
+              <Label className="text-xs uppercase tracking-widest text-muted-foreground">Prix (DT)</Label>
               <Input type="number" step="0.01" {...register("prix")} className="rounded-none border-border/50 mt-1 h-9" />
             </div>
           </div>
@@ -942,10 +943,10 @@ function StatsLivraison() {
     <div className="space-y-6">
       <SectionTitle>Statistiques — Livraison</SectionTitle>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="En dépôt" value="0" sub="Profit estimé: 0 €" icon={Package} />
-        <StatCard label="En transit" value="0" sub="Profit estimé: 0 €" icon={Truck} accent="text-blue-400" />
-        <StatCard label="Livrées" value="0" sub="Profit: 0 €" icon={TrendingUp} accent="text-green-400" />
-        <StatCard label="Retournées" value="0" sub="Perte: 0 €" icon={RefreshCw} accent="text-red-400" />
+        <StatCard label="En dépôt" value="0" sub="Profit estimé: 0.000 DT" icon={Package} />
+        <StatCard label="En transit" value="0" sub="Profit estimé: 0.000 DT" icon={Truck} accent="text-blue-400" />
+        <StatCard label="Livrées" value="0" sub="Profit: 0.000 DT" icon={TrendingUp} accent="text-green-400" />
+        <StatCard label="Retournées" value="0" sub="Perte: 0.000 DT" icon={RefreshCw} accent="text-red-400" />
       </div>
       <div className="bg-card border border-border p-5">
         <p className="text-sm font-medium text-foreground mb-4">Performance livraison</p>
@@ -998,10 +999,10 @@ function StatsProduits() {
     <div className="space-y-6">
       <SectionTitle>Statistiques — Produits</SectionTitle>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total unités" value={total} sub={`Valeur: ${totalVal.toFixed(0)} €`} icon={Package} />
-        <StatCard label="Unités en attente" value="0" sub="Valeur: 0 €" icon={Loader2} accent="text-yellow-400" />
-        <StatCard label="Unités confirmées" value="0" sub="Valeur: 0 €" icon={TrendingUp} accent="text-green-400" />
-        <StatCard label="Unités rejetées" value="0" sub="Valeur: 0 €" icon={RefreshCw} accent="text-red-400" />
+        <StatCard label="Total unités" value={total} sub={`Valeur: ${formatPrice(totalVal)}`} icon={Package} />
+        <StatCard label="Unités en attente" value="0" sub="Valeur: 0.000 DT" icon={Loader2} accent="text-yellow-400" />
+        <StatCard label="Unités confirmées" value="0" sub="Valeur: 0.000 DT" icon={TrendingUp} accent="text-green-400" />
+        <StatCard label="Unités rejetées" value="0" sub="Valeur: 0.000 DT" icon={RefreshCw} accent="text-red-400" />
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="En dépôt" value="0" icon={Package} accent="text-blue-400" />
@@ -1031,12 +1032,12 @@ function StatsMarketing() {
     <div className="space-y-6">
       <SectionTitle>Statistiques — Marketing</SectionTitle>
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        <StatCard label="Commandes en attente" value="0" sub="Valeur: 0 €" icon={Package} />
-        <StatCard label="Commandes confirmées" value="0" sub="Valeur: 0 €" icon={TrendingUp} accent="text-green-400" />
-        <StatCard label="Commandes rejetées" value="0" sub="Valeur: 0 €" icon={RefreshCw} accent="text-red-400" />
-        <StatCard label="Total commandes" value="0" sub="Valeur: 0 €" icon={ShoppingCart} accent="text-blue-400" />
-        <StatCard label="Commandes livrées" value="0" sub="Profit: 0 €" icon={Truck} accent="text-purple-400" />
-        <StatCard label="Commandes retournées" value="0" sub="Perte: 0 €" icon={RefreshCw} accent="text-red-400" />
+        <StatCard label="Commandes en attente" value="0" sub="Valeur: 0.000 DT" icon={Package} />
+        <StatCard label="Commandes confirmées" value="0" sub="Valeur: 0.000 DT" icon={TrendingUp} accent="text-green-400" />
+        <StatCard label="Commandes rejetées" value="0" sub="Valeur: 0.000 DT" icon={RefreshCw} accent="text-red-400" />
+        <StatCard label="Total commandes" value="0" sub="Valeur: 0.000 DT" icon={ShoppingCart} accent="text-blue-400" />
+        <StatCard label="Commandes livrées" value="0" sub="Profit: 0.000 DT" icon={Truck} accent="text-purple-400" />
+        <StatCard label="Commandes retournées" value="0" sub="Perte: 0.000 DT" icon={RefreshCw} accent="text-red-400" />
       </div>
       <div className="bg-card border border-border">
         <div className="px-5 py-4 border-b border-border">
@@ -1056,13 +1057,13 @@ function CalculateurSection({ calc, setCalc, result, onCalculate }: {
   onCalculate: () => void;
 }) {
   const fields = [
-    { key: "deliveryCost", label: "Coût de livraison", unit: "€" },
-    { key: "returnCost", label: "Coût de retour", unit: "€" },
-    { key: "fulfillmentCost", label: "Coût de fulfillment", unit: "€" },
-    { key: "productCost", label: "Coût du produit", unit: "€" },
-    { key: "leadCost", label: "Coût par lead", unit: "€" },
+    { key: "deliveryCost", label: "Coût de livraison", unit: "DT" },
+    { key: "returnCost", label: "Coût de retour", unit: "DT" },
+    { key: "fulfillmentCost", label: "Coût de fulfillment", unit: "DT" },
+    { key: "productCost", label: "Coût du produit", unit: "DT" },
+    { key: "leadCost", label: "Coût par lead", unit: "DT" },
     { key: "confirmationRate", label: "Taux de confirmation", unit: "%" },
-    { key: "totalSellingPrice", label: "Prix de vente total", unit: "€" },
+    { key: "totalSellingPrice", label: "Prix de vente total", unit: "DT" },
     { key: "totalLeads", label: "Total leads reçus", unit: "" },
     { key: "deliveryRate", label: "Taux de livraison", unit: "%" },
   ];
@@ -1096,10 +1097,10 @@ function CalculateurSection({ calc, setCalc, result, onCalculate }: {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             <ResultCard label="Leads confirmés" value={`${result.confirmedLeads}`} unit="leads" />
             <ResultCard label="Leads livrés" value={`${result.deliveredLeads}`} unit="leads" />
-            <ResultCard label="Profit par unité" value={`${result.profitPerUnit}`} unit="€/unité" color={result.profitPerUnit >= 0 ? "text-green-400" : "text-red-400"} />
-            <ResultCard label="Profit total" value={`${result.totalProfit}`} unit="€" color={result.totalProfit >= 0 ? "text-green-400" : "text-red-400"} />
-            <ResultCard label="Coût/lead livré" value={`${result.leadCostPerDelivered}`} unit="€" />
-            <ResultCard label="Lead cost seuil" value={`${result.breakEven}`} unit="€" />
+            <ResultCard label="Profit par unité" value={`${result.profitPerUnit}`} unit="DT/unité" color={result.profitPerUnit >= 0 ? "text-green-400" : "text-red-400"} />
+            <ResultCard label="Profit total" value={`${result.totalProfit}`} unit="DT" color={result.totalProfit >= 0 ? "text-green-400" : "text-red-400"} />
+            <ResultCard label="Coût/lead livré" value={`${result.leadCostPerDelivered}`} unit="DT" />
+            <ResultCard label="Lead cost seuil" value={`${result.breakEven}`} unit="DT" />
           </div>
         </div>
       )}
@@ -1127,15 +1128,15 @@ function BudgetSection() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="bg-card border border-border p-5">
           <p className="text-xs text-muted-foreground uppercase tracking-widest mb-2">Solde actuel</p>
-          <p className="text-2xl font-serif text-primary">{revenue.toFixed(2)} €</p>
+          <p className="text-2xl font-serif text-primary">{formatPrice(revenue)}</p>
         </div>
         <div className="bg-card border border-border p-5">
           <p className="text-xs text-muted-foreground uppercase tracking-widest mb-2">Dépenses</p>
-          <p className="text-2xl font-serif text-red-400">0.00 €</p>
+          <p className="text-2xl font-serif text-red-400">0.000 DT</p>
         </div>
         <div className="bg-card border border-border p-5">
           <p className="text-xs text-muted-foreground uppercase tracking-widest mb-2">Revenus</p>
-          <p className="text-2xl font-serif text-green-400">{revenue.toFixed(2)} €</p>
+          <p className="text-2xl font-serif text-green-400">{formatPrice(revenue)}</p>
         </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -1279,7 +1280,7 @@ function BoutiqueParams() {
       <div className="bg-card border border-border p-6">
         <p className="text-sm font-medium text-foreground mb-5 pb-3 border-b border-border">Détails de la boutique</p>
         <div className="grid grid-cols-2 gap-4">
-          {[["Nom de la boutique", "VELMORA"], ["Titre de la boutique", "VELMORA"], ["Domaine", "velmora.replit.app"], ["Téléphone", ""], ["Email de la boutique", "admin@velmora.fr"], ["Facebook", ""], ["Instagram", ""], ["TikTok", ""], ["WhatsApp", ""]].map(([label, value]) => (
+          {[["Nom de la boutique", "VELMORA"], ["Titre de la boutique", "VELMORA"], ["Domaine", "velmora.luxury-perfume.app"], ["Téléphone", ""], ["Email de la boutique", "admin@velmora.fr"], ["Facebook", ""], ["Instagram", ""], ["TikTok", ""], ["WhatsApp", ""]].map(([label, value]) => (
             <div key={label}>
               <Label className="text-xs uppercase tracking-widest text-muted-foreground">{label}</Label>
               <Input defaultValue={value} className="rounded-none border-border/50 mt-1 h-9 text-sm" />
@@ -1301,7 +1302,7 @@ function BoutiqueParams() {
             <Label className="text-xs uppercase tracking-widest text-muted-foreground">Montant max de commande</Label>
             <div className="flex items-center mt-1 border border-border/50">
               <input type="number" className="flex-1 bg-transparent px-3 py-2 text-sm focus:outline-none" />
-              <span className="px-3 text-xs text-muted-foreground border-l border-border/50 py-2">€</span>
+              <span className="px-3 text-xs text-muted-foreground border-l border-border/50 py-2">DT</span>
             </div>
           </div>
         </div>
@@ -1338,7 +1339,7 @@ function BoutiqueFacturation() {
         </div>
         <div className="bg-primary/10 border border-primary/20 p-5 flex flex-col gap-3">
           <p className="text-xs text-muted-foreground uppercase tracking-widest">Mon solde</p>
-          <p className="text-3xl font-serif text-primary">{(stats?.chiffreAffaires || 0).toFixed(2)} €</p>
+          <p className="text-3xl font-serif text-primary">{formatPrice(stats?.chiffreAffaires || 0)}</p>
           <button className="mt-auto text-xs border border-primary/40 text-primary px-4 py-2 hover:bg-primary/10 transition-colors flex items-center gap-1.5 justify-center">
             <Plus className="w-3.5 h-3.5" /> Ajouter un solde
           </button>

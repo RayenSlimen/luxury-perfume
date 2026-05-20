@@ -6,8 +6,11 @@ import { ProductCard } from "@/components/ProductCard";
 import { motion } from "framer-motion";
 
 export default function Home() {
-  const { data: vedettes, isLoading: loadingVedettes } = useGetVedettes();
-  const { data: meilleuresVentes, isLoading: loadingVentes } = useGetMeilleuresVentes();
+  const { data: vedettesRaw, isLoading: loadingVedettes } = useGetVedettes();
+  const { data: meilleuresVentesRaw, isLoading: loadingVentes } = useGetMeilleuresVentes();
+
+  const vedettes = Array.isArray(vedettesRaw) ? vedettesRaw : [];
+  const meilleuresVentes = Array.isArray(meilleuresVentesRaw) ? meilleuresVentesRaw : [];
 
   return (
     <PageTransition className="pt-0 pb-0">
@@ -16,7 +19,7 @@ export default function Home() {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img 
-            src="/images/hero.png" 
+            src="/images/ChatGPT Image May 18, 2026, 02_19_17 PM.png" 
             alt="Velmora Hero" 
             className="w-full h-full object-cover object-center"
             onError={(e) => {
@@ -89,7 +92,7 @@ export default function Home() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {vedettes?.slice(0, 3).map(produit => (
+              {vedettes.slice(0, 3).map(produit => (
                 <ProductCard key={produit.id} product={produit} />
               ))}
             </div>
@@ -123,7 +126,7 @@ export default function Home() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {meilleuresVentes?.slice(0, 4).map(produit => (
+              {meilleuresVentes.slice(0, 4).map(produit => (
                 <ProductCard key={produit.id} product={produit} />
               ))}
             </div>

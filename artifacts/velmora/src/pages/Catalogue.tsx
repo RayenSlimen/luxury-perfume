@@ -13,7 +13,7 @@ export default function Catalogue() {
   const initialCat = searchParams.get('categorie') as GetProduitsCategorie | undefined;
 
   const [recherche, setRecherche] = useState("");
-  const [categorie, setCategorie] = useState<GetProduitsCategorie | undefined>(initialCat);
+  const [categorie, setCategorie] = useState<GetProduitsCategorie | undefined>(undefined);
   const [debouncedRecherche, setDebouncedRecherche] = useState("");
 
   // Debounce search
@@ -32,8 +32,8 @@ export default function Catalogue() {
 
   const categories = [
     { id: undefined, label: "Tous" },
-    { id: "femme" as GetProduitsCategorie, label: "Pour Elle" },
-    { id: "homme" as GetProduitsCategorie, label: "Pour Lui" },
+    { id: "femme" as GetProduitsCategorie, label: "Pour Femme" },
+    { id: "homme" as GetProduitsCategorie, label: "Pour Homme" },
     { id: "unisexe" as GetProduitsCategorie, label: "Unisexe" },
   ];
 

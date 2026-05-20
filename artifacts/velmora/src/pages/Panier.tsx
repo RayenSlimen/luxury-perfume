@@ -147,7 +147,7 @@ export default function Panier() {
                     <div>
                       <h3 className="font-serif text-xl mb-1">{item.produit?.nom}</h3>
                       <p className="text-xs text-muted-foreground tracking-widest uppercase mb-2">
-                        {item.produit?.categorie === "homme" ? "Pour Lui" : item.produit?.categorie === "femme" ? "Pour Elle" : "Unisexe"}
+                        {item.produit?.categorie === "homme" ? "Pour Homme" : item.produit?.categorie === "femme" ? "Pour Femme" : "Unisexe"}
                       </p>
                       <p className="md:hidden text-primary mt-2">{(item.produit?.prix || 0).toFixed(2)} DT</p>
                     </div>

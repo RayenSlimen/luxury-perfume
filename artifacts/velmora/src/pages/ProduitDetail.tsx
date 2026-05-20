@@ -8,10 +8,10 @@ import { useCart } from "@/lib/cart";
 import { useToast } from "@/hooks/use-toast";
 import { ProductCard } from "@/components/ProductCard";
 import { Link } from "wouter";
-
+import { formatPrice } from "@/lib/utils";
 const VOLUMES = [
   { label: "50 ml", multiplier: 1 },
-  { label: "100 ml", multiplier: 1.65 },
+  { label: "100 ml", Plus: 15 },
 ] as const;
 type VolumeLabel = typeof VOLUMES[number]["label"];
 
@@ -57,7 +57,8 @@ export default function ProduitDetail() {
   const handleAdd = async () => {
     setIsAdding(true);
     try {
-      await addToCart(produit.id, quantite, produit);
+      const produitAvecPrix = { ...produit, prix: produit.prix + (volume === "100 ml" ? 15 : 0) };
+      await addToCart(produit.id, quantite, produitAvecPrix);
       toast({
         title: "Ajouté au panier",
         description: `${quantite}x ${produit.nom} ajouté avec succès.`,
@@ -76,7 +77,7 @@ export default function ProduitDetail() {
   };
 
   const selectedVolume = VOLUMES.find(v => v.label === volume)!;
-  const prixAffiche = (produit.prix * selectedVolume.multiplier).toFixed(2);
+  const prixAffiche = formatPrice(produit.prix + (volume === "100 ml" ? 15 : 0));
   const imageUrl = produit.imageUrl || "/images/perfume-1.png";
 
   return (
@@ -106,8 +107,8 @@ export default function ProduitDetail() {
           <div className="flex flex-col justify-center">
             <p className="text-primary tracking-widest uppercase text-sm mb-4">
               {{
-                homme: 'Pour Lui',
-                femme: 'Pour Elle',
+                homme: 'Pour homme',
+                femme: 'Pour femme',
                 unisexe: 'Unisexe',
               }[produit.categorie] ?? produit.categorie}
             </p>
@@ -115,7 +116,7 @@ export default function ProduitDetail() {
               {produit.nom}
             </h1>
             <p className="text-2xl text-foreground/90 font-medium mb-8">
-              {prixAffiche} €
+              {prixAffiche}
             </p>
 
             {/* Volume selector */}
@@ -147,7 +148,7 @@ export default function ProduitDetail() {
             {/* Livraison gratuite badge */}
             <div className="flex items-center gap-2 mb-6 text-sm text-foreground/70">
               <Truck className="w-4 h-4 text-primary shrink-0" />
-              <span>Livraison gratuite — <span className="text-foreground">2 à 3 jours ouvrés</span></span>
+              <span>Livraison gratuite — <span className="text-foreground">24h à 72h </span></span>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center pt-8 border-t border-border">
@@ -181,7 +182,7 @@ export default function ProduitDetail() {
 
             <div className="mt-10 flex items-center gap-2 text-xs text-muted-foreground">
               <Package className="w-4 h-4 shrink-0" />
-              <span>Échantillon offert avec chaque commande</span>
+              <span>Échantillon 10 ml offert avec chaque commande</span>
             </div>
           </div>
         </div>

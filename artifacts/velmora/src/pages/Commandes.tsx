@@ -75,7 +75,7 @@ export default function Commandes() {
                   </div>
                   <div className="flex flex-col md:items-end gap-2">
                     {getStatusBadge(commande.statut)}
-                    <p className="font-serif text-xl text-primary">{commande.total.toFixed(2)} €</p>
+                    <p className="font-serif text-xl text-primary">{formatPrice(commande.total)}</p>
                   </div>
                 </div>
 
@@ -97,7 +97,7 @@ export default function Commandes() {
                         <p className="text-sm text-muted-foreground">Quantité: {item.quantite}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-foreground font-medium">{(item.prixUnitaire * item.quantite).toFixed(2)} €</p>
+                        <p className="text-foreground font-medium">{formatPrice(item.prixUnitaire * item.quantite)}</p>
                       </div>
                     </div>
                   ))}
