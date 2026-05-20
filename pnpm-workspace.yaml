@@ -41,9 +41,6 @@ packages:
   - scripts
 
 catalog:
-  '@luxury-perfume/vite-plugin-cartographer': ^0.5.1
-  '@luxury-perfume/vite-plugin-dev-banner': ^0.1.1
-  '@luxury-perfume/vite-plugin-runtime-error-modal': ^0.0.6
   '@tailwindcss/vite': ^4.1.14
   '@tanstack/react-query': ^5.90.21
   '@types/node': ^25.3.3
